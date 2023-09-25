@@ -1,0 +1,29 @@
+{
+  "widgetUrl": {
+    "display_name": "Widget URL",
+    "description": "Please enter your Brekeke Widget URL",
+    "type": "text",
+    "required": true
+  },
+  "domain": {
+    "display_name": "Domain Name",
+    "description": "Please enter your domain name",
+    "type": "domain",
+    "data-bind": "product.domain",
+    "required": true,
+    "type_attributes": {
+      "product": "current"
+    }
+  },
+  "apiKey": {
+    "display_name": "API key",
+    "description": "Please enter your account’s API key",
+    "type": "api_key",
+    "data-bind": "product.api_key",
+    "required": true,
+    "secure": true,
+    "type_attributes": {
+      "product": "current"
+    }
+  }
+}

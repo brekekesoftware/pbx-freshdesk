@@ -1,0 +1,26 @@
+{
+  "platform-version": "2.3",
+  "product": {
+    "freshdesk": {
+      "location": {
+        "cti_global_sidebar": {
+          "url": "index.html",
+          "icon": "styles/images/icon.svg"
+        }
+      },
+      "requests": {
+        "createContact": {},
+        "findContacts": {},
+        "createTicket": {},
+        "searchContacts": {},
+        "searchNumberByContextPhone": {},
+        "searchNumberByContextQuery": {},
+        "searchNumberByQueryParam": {}
+      }
+    }
+  },
+  "engines": {
+    "node": "18.17.1",
+    "fdk": "9.0.4"
+  }
+}
