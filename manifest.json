@@ -12,10 +12,6 @@
         "createContact": {},
         "findContacts": {},
         "createTicket": {},
-        "searchContacts": {},
-        "searchNumberByContextPhone": {},
-        "searchNumberByContextQuery": {},
-        "searchNumberByQueryParam": {}
       }
     }
   },

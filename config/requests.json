@@ -34,52 +34,5 @@
         "Content-Type": "application/json"
       }
     }
-  },
-  "searchContacts": {
-    "schema": {
-      "method": "GET",
-      "host": "<%= iparam.domain %>.freshdesk.com",
-      "path": "/api/v2/search/contacts",
-      "headers": {
-        "Authorization": "Bearer <%= encode(iparam.apiKey) %>",
-        "Content-Type": "application/json"
-      }
-    }
-  },
-  "searchNumberByContextPhone": {
-    "schema": {
-      "method": "GET",
-      "host": "<%= iparam.domain %>.freshdesk.com",
-      "path": "/api/v2/search/contacts?query=\"phone:<%= context.phone %> OR mobile:<%= context.phone %>\"",
-      "headers": {
-        "Authorization": "Bearer <%= encode(iparam.apiKey) %>",
-        "Content-Type": "application/json"
-      }
-    }
-  },
-  "searchNumberByContextQuery": {
-    "schema": {
-      "method": "GET",
-      "host": "<%= iparam.domain %>.freshdesk.com",
-      "path": "/api/v2/search/contacts?query=\"<%= context.query %>\"",
-      "headers": {
-        "Authorization": "Bearer <%= encode(iparam.apiKey) %>",
-        "Content-Type": "application/json"
-      }
-    }
-  },
-  "searchNumberByQueryParam": {
-    "schema": {
-      "method": "GET",
-      "host": "<%= iparam.domain %>.freshdesk.com",
-      "path": "/api/v2/search/contacts",
-      "headers": {
-        "Authorization": "Bearer <%= encode(iparam.apiKey) %>",
-        "Content-Type": "application/json"
-      },
-      "query": {
-        "query": "\"<%= context.query %>\""
-      }
-    }
   }
 }

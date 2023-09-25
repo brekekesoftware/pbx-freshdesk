@@ -44,6 +44,17 @@ const sendMessage = (name, data) => {
   }
 };
 
+// const messageHandlers = {
+//   [messageName('widgetReady')]: _ => void _,
+//   [messageName('logged-in')]: _ => void _,
+//   [messageName('logged-out')]: _ => void _,
+//   [messageName('call')]: _ => void _,
+//   [messageName('call-updated')]: _ => void _,
+//   [messageName('call-ended')]: _ => void _,
+//   [messageName('contact-selected')]: _ => void _,
+//   [messageName('log')]: _ => void _,
+// };
+
 window.addEventListener('messageerror', ev => logger('message error', ev));
 window.addEventListener('message', ev => {
   try {
@@ -53,6 +64,7 @@ window.addEventListener('message', ev => {
     logger(`${name} message received`, ev);
     logger(`${name} message data`, data);
 
+    // messageHandlers[name](data);
     switch (name) {
       case messageName('widgetReady'):
         logger('widget ready');
@@ -241,22 +253,6 @@ const onCall = (call) => {
         sendMessage('notification', { message: response.message, type: 'error' });
       }
     });
-
-  client.request.invokeTemplate('searchContacts', { query: { query: `phone:${phone} OR mobile:${phone}` } })
-    .then(data => logger('searchContacts', JSON.parse(data.response)))
-    .catch(e => logger('searchContacts error', e));
-
-  client.request.invokeTemplate('searchNumberByContextPhone', { context: { phone } })
-    .then(data => logger('searchNumberByContextPhone', JSON.parse(data.response)))
-    .catch(e => logger('searchNumberByContextPhone error', e));
-
-  client.request.invokeTemplate('searchNumberByContextQuery', { context: { query: `phone:${phone} OR mobile:${phone}` } })
-    .then(data => logger('searchNumberByContextQuery', JSON.parse(data.response)))
-    .catch(e => logger('searchNumberByContextQuery error', e));
-
-  client.request.invokeTemplate('searchNumberByQueryParam', { context: { query: `phone:${phone} OR mobile:${phone}` } })
-    .then(data => logger('searchNumberByQueryParam', JSON.parse(data.response)))
-    .catch(e => logger('searchNumberByQueryParam error', e));
 };
 
 const onCallEnded = (call) => {
