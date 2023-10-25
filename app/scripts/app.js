@@ -2,6 +2,7 @@
  * REFERENCES
  * DOCS: https://developer.freshdesk.com/v2/docs
  * API: https://developers.freshdesk.com/api
+ * https://developer.freshdesk.com/v2/docs/custom-apps/
  */
 
 let client;
@@ -44,16 +45,88 @@ const sendMessage = (name, data) => {
   }
 };
 
-// const messageHandlers = {
-//   [messageName('widgetReady')]: _ => void _,
-//   [messageName('logged-in')]: _ => void _,
-//   [messageName('logged-out')]: _ => void _,
-//   [messageName('call')]: _ => void _,
-//   [messageName('call-updated')]: _ => void _,
-//   [messageName('call-ended')]: _ => void _,
-//   [messageName('contact-selected')]: _ => void _,
-//   [messageName('log')]: _ => void _,
-// };
+const messageHandlers = {
+  [messageName('widgetReady')]: (_, ev) => {
+
+    logger('widget ready');
+    widgetWindow = ev.source;
+    // client.instance.resize({ height: '500px' });
+
+    sendMessage('config', {
+      logButtonTitle: 'Create Ticket',
+      logInputs: [
+        {
+          label: 'Subject',
+          name: 'subject',
+          type: 'text',
+          required: true,
+          defaultValue: `Call on #createdAt`,
+        },
+        {
+          label: 'Description',
+          name: 'description',
+          type: 'textarea',
+          required: true,
+        },
+        // {
+        //   label: 'Status',
+        //   name: 'status',
+        //   type: 'select',
+        //   defaultValue: 2,
+        //   options: [
+        //     { label: 'Open', value: 2 },
+        //     { label: 'Pending', value: 3 },
+        //     { label: 'Resolved', value: 4 },
+        //     { label: 'Closed', value: 5 },
+        //   ],
+        // },
+        // {
+        //   label: 'Priority',
+        //   name: 'priority',
+        //   type: 'select',
+        //   defaultValue: 1,
+        //   options: [
+        //     { label: 'Low', value: 1 },
+        //     { label: 'Medium', value: 2 },
+        //     { label: 'High', value: 3 },
+        //     { label: 'Urgent', value: 4 },
+        //   ],
+        // },
+      ],
+    });
+  },
+  [messageName('logged-in')]: data => {
+    pbxAccount = data;
+    client.data.get('loggedInUser')
+      .then(({ loggedInUser }) => {
+        logger('loggedInUser', loggedInUser);
+        if (loggedInUser) agent = loggedInUser;
+      })
+      .catch((error) => logger('loggedInUser error', error));
+  },
+  [messageName('logged-out')]: () => {
+    currentCall = undefined;
+    dialOut = undefined;
+    agent = undefined;
+    pbxAccount = undefined;
+    calls.length = 0;
+  },
+  [messageName('call')]: data => {
+    currentCall = data;
+  },
+  [messageName('call-updated')]: data => {
+    const call = data;
+
+    const callId = `${call.pbxRoomId}-${call.id}`;
+    if (calls.includes(callId)) return;
+    calls.push(callId);
+
+    onCall(call);
+  },
+  [messageName('call-ended')]: data => void onCallEnded(data),
+  [messageName('contact-selected')]: data => void onContactSelected(data),
+  [messageName('log')]: data => void onLog(data),
+};
 
 window.addEventListener('messageerror', ev => logger('message error', ev));
 window.addEventListener('message', ev => {
@@ -64,94 +137,7 @@ window.addEventListener('message', ev => {
     logger(`${name} message received`, ev);
     logger(`${name} message data`, data);
 
-    // messageHandlers[name](data);
-    switch (name) {
-      case messageName('widgetReady'):
-        logger('widget ready');
-        widgetWindow = ev.source;
-        // client.instance.resize({ height: '500px' });
-
-        sendMessage('config', {
-          logButtonTitle: 'Create Ticket',
-          logInputs: [
-            {
-              label: 'Subject',
-              name: 'subject',
-              type: 'text',
-              required: true,
-              defaultValue: call => `Call on ${new Date(call.createdAt).toUTCString()}`,
-            },
-            {
-              label: 'Description',
-              name: 'description',
-              type: 'textarea',
-              required: true,
-            },
-            // {
-            //   label: 'Status',
-            //   name: 'status',
-            //   type: 'select',
-            //   defaultValue: 2,
-            //   options: [
-            //     { label: 'Open', value: 2 },
-            //     { label: 'Pending', value: 3 },
-            //     { label: 'Resolved', value: 4 },
-            //     { label: 'Closed', value: 5 },
-            //   ],
-            // },
-            // {
-            //   label: 'Priority',
-            //   name: 'priority',
-            //   type: 'select',
-            //   defaultValue: 1,
-            //   options: [
-            //     { label: 'Low', value: 1 },
-            //     { label: 'Medium', value: 2 },
-            //     { label: 'High', value: 3 },
-            //     { label: 'Urgent', value: 4 },
-            //   ],
-            // },
-          ],
-        });
-        break;
-      case messageName('logged-in'):
-        pbxAccount = data;
-        client.data.get('loggedInUser')
-          .then(({ loggedInUser }) => {
-            logger('loggedInUser', loggedInUser);
-            if (loggedInUser) agent = loggedInUser;
-          })
-          .catch((error) => logger('loggedInUser error', error));
-        break;
-      case messageName('logged-out'):
-        currentCall = undefined;
-        dialOut = undefined;
-        agent = undefined;
-        pbxAccount = undefined;
-        calls.length = 0;
-        break;
-      case messageName('call'):
-        currentCall = data;
-        break;
-      case messageName('call-updated'):
-        const call = data;
-
-        const callId = `${call.pbxRoomId}-${call.id}`;
-        if (calls.includes(callId)) return;
-        calls.push(callId);
-
-        onCall(call);
-        break;
-      case messageName('call-ended'):
-        onCallEnded(data);
-        break;
-      case messageName('contact-selected'):
-        onContactSelected(data);
-        break;
-      case messageName('log'):
-        onLog(data);
-        break;
-    }
+    messageHandlers[name](data, ev);
   } catch (e) {
     logger('message error, invalid json string', e);
   }
@@ -175,7 +161,11 @@ async function init() {
   client.events.on('app.activated', onAppActivate);
 }
 
+let activated = false;
+
 async function onAppActivate() {
+  if (activated) return;
+  activated = true;
   client.instance.resize({ height: '500px' });
   logger('onAppActivate');
 
