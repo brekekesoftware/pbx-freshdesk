@@ -296,7 +296,12 @@ const onLog = (log) => {
         const ticket = JSON.parse(data.response);
         sendMessage('log-saved', log);
         openTicket(ticket.id);
+      } else {
+        sendMessage('log-failed', log);
       }
     })
-    .catch((error) => logger('ticket error', error));
+    .catch((error) => {
+      sendMessage('log-failed', log);
+      logger('ticket error', error);
+    });
 };
